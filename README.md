@@ -70,21 +70,29 @@ A Laravel-based RESTful API designed to streamline task management processes.
 
     -   `POST /api/login`: Login and retrieve token
 
+-   **Tasks Admin:**
+
+    -   All what manager can do
+    -   `GET /reports/tasks`: Generate PDF report for tasks
+
 -   **Tasks Management:**
 
-    -   `GET /api/tasks`: List tasks
+    -   `GET /api/tasks`: List all tasks
+    -   `GET /api/tasks?status=...`: List all tasks with filtration (Assigned, Not Assigned,Resolved)
     -   `POST /api/tasks`: Create a task
     -   `PUT /api/tasks/{taskId}`: Update a task
     -   `PUT /api/tasks/{taskId}/assign`: Assign a task
     -   `POST /api/tasks/{taskId}/resolve`: Mark a task as resolved
 
+-   **Tasks Employee:**
+    -   `GET /api/employee/tasks.`: List tasks
+    -   `GET /api/employee/tasks`: List tasks with filtration (Resolved, Not Resolved)
+    -   `POST /api/employee/tasks/{taskId}/resolve`: Mark a task as Resolved
+
 -   **Notifications:**
 
     -   `GET /api/notifications`: Get notifications filtered by read status
     -   `PUT /api/notifications/{id}/read`: Mark a notification as read
-
--   **Reports:**
-    -   `GET /api/reports/tasks`: Generate PDF report for tasks
 
 ## Notes
 
