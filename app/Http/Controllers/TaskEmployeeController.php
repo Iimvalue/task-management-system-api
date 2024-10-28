@@ -71,7 +71,7 @@ class TaskEmployeeController extends Controller
 
     private function getWeather()
     {
-        $apiKey = '3b17d9441d97dc759c182fa92a859d7a';
+        $apiKey = env('WEATHER_KEY');
         $city = 'Buraidah';
         $url = "http://api.openweathermap.org/data/2.5/weather?q={$city}&appid={$apiKey}&units=metric";
 
