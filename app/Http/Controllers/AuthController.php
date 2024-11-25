@@ -15,12 +15,15 @@ class AuthController extends Controller
         ]);
 
         if (!auth()->attempt($validateData)) {
-            return response()->json(['message' => "Invalid token"], 401);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid email or password',
+            ], 401);
         }
 
-        $user = auth()->user();
+        $user = auth()->user()->makeHidden(['created_at', 'updated_at', 'deleted_at']);
         $token = $user->createToken("auth_token")->plainTextToken;
 
-        return response()->json(['user' => $user, 'token' => $token]);
+        return response()->json(['status' => "success", 'user' => $user, 'token' => $token]);
     }
 }
