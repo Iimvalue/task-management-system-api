@@ -20,20 +20,27 @@ class TaskManagerController extends Controller
     public function index(Request $request)
     { {
             $status = $request->query('status');
-
             $query = Task::query();
 
-            if ($status === 'Assigned') {
-                $query->where('assign_status', 'Assigned');
-            } elseif ($status === 'Not Assigned') {
-                $query->where('assign_status', 'Not Assigned');
-            } elseif ($status === 'Resolved') {
-                $query->where('resolve_status', 'Resolved');
+            $statusCondisions = [
+                "Assigned" => ['assign_status', 'Assigned'],
+                "Not Assigned" => ['assign_status', 'Not Assigned'],
+                "Resolved" => ['resolve_status', 'Resolved']
+            ];
+
+            if (isset($statusCondisions[$status])) {
+                [$column, $value] = $statusCondisions[$status];
+                $query->where($column, $value);
             }
+
+            if ($status && !isset($conditions[$status])) {
+                return response()->json(['error' => 'Invalid status provided.'], 400);
+            }
+
 
             $tasks = $query->get();
 
-            return response()->json(['tasks' => $tasks]);
+            return response()->json(['data' => $tasks]);
         }
     }
 
@@ -44,8 +51,8 @@ class TaskManagerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string',
-            'description' => 'nullable|string',
+            'title' => 'required|string|max:80',
+            'description' => 'nullable|string|max:1000',
         ]);
 
         $task = Task::create([
@@ -54,7 +61,10 @@ class TaskManagerController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        return response()->json($task, 201);
+        return response()->json([
+            'message' => 'Task created successfully.',
+            'data' => $task,
+        ], 201);
     }
 
     /**
@@ -77,7 +87,10 @@ class TaskManagerController extends Controller
         $this->createNotification($task->assigned_to, $task->id);
 
 
-        return response()->json(['Task assigned successfully', 'task' => $task]);
+        return response()->json([
+            'message' => 'Task assigned successfully',
+            'data' => $task
+        ], 200);
     }
 
     /**
@@ -85,16 +98,17 @@ class TaskManagerController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        $request->validate([
-            'title' => 'required|string',
-            'description' => 'nullable|string',
+        $data = $request->validate([
+            'title' => 'required|string|max:80',
+            'description' => 'nullable|string|max:1000',
         ]);
 
-        $task = $task->findOrFail($task->id);
+        $task->update($data);
 
-        $task->update($request->all());
-
-        return response()->json(['message' => 'Task updated successfully', 'task' => $task]);
+        return response()->json([
+            'message' => 'Task assigned successfully',
+            'data' => $task
+        ], 200);
     }
 
 
@@ -105,7 +119,7 @@ class TaskManagerController extends Controller
     {
         $task->delete();
 
-        return response()->json(['Task deleted successfully']);
+        return response()->json(['message' => 'Task deleted successfully'], 200);
     }
 
     private function createNotification($userId, $taskId)
