@@ -83,6 +83,7 @@ A Laravel-based RESTful API designed to streamline task management processes.
     -   `PUT /api/tasks/{taskId}`: Update a task
     -   `PUT /api/tasks/{taskId}/assign`: Assign a task
     -   `POST /api/tasks/{taskId}/resolve`: Mark a task as resolved
+    -   `Delete /api/tasks/{taskId}`: Delete a task
 
 -   **Tasks Employee:**
     -   `GET /api/employee/tasks.`: List tasks
