@@ -22,18 +22,25 @@ class TaskEmployeeController extends Controller
     {
 
         $status = $request->query('status');
+        $statusConditions = [
+            'Resolved' => ['resolve_status', 'Resolved'],
+            'Not Resolved' => ['resolve_status', 'Not Resolved'],
 
+        ];
         $query = Task::where('assigned_to', auth()->id());
 
-        if ($status === 'Resolved') {
-            $query->where('resolve_status', 'Resolved');
-        } elseif ($status === 'Not Resolved') {
-            $query->where('resolve_status', 'Not Resolved');
+        if (isset($statusConditions[$status])) {
+            [$column, $value] = $statusConditions[$status];
+            $query->where($column, $value);
         }
 
-        $tasks = $query->get();
+        if ($status && !isset($statusConditions[$status])) {
+            return response()->json(['error' => 'Invalid status provided.'], 400);
+        }
 
-        return response()->json(['tasks' => $tasks]);
+        $tasks = $query->get()->makeHidden(['created_at', 'deleted_at', 'assign_status']);
+
+        return response()->json(['data' => $tasks]);
     }
 
     /**
@@ -54,9 +61,7 @@ class TaskEmployeeController extends Controller
         $task->save();
 
         $this->createNotification($task->created_by, $task->id);
-
-
-
+        
         $weather = $this->getWeather();
 
         return response()->json([
